@@ -50,6 +50,7 @@ from .const import (
     CONF_SEND_COMMAND,
     CONF_SMARTMOWING,
     CONF_DOWNLOAD_MAP,
+    CONF_DELETE_ALERT,
     DEFAULT_NAME_COMMANDS,
     DEFAULT_MAP_NAME,
     DOMAIN,
@@ -70,6 +71,8 @@ from .const import (
     SERVICE_NAME_COMMAND,
     SERVICE_NAME_SMARTMOW,
     SERVICE_NAME_DOWNLOAD_MAP,
+    SERVICE_NAME_DELETE_ALERT,
+    SERVICE_NAME_DELETE_ALERT_ALL,
 )
 from .sensor import IndegoSensor
 
@@ -86,6 +89,14 @@ SERVICE_SCHEMA_SMARTMOWING = vol.Schema({
 })
 SERVICE_SCHEMA_DOWNLOAD_MAP = vol.Schema({
     vol.Optional(CONF_DOWNLOAD_MAP, default=DEFAULT_MAP_NAME): cv.string
+})
+
+SERVICE_SCHEMA_DELETE_ALERT = vol.Schema({ 
+    vol.Required(CONF_DELETE_ALERT): cv.positive_int
+})
+
+SERVICE_SCHEMA_DELETE_ALERT_ALL = vol.Schema({
+    vol.Required(CONF_DELETE_ALERT): cv.string
 })
 
 
@@ -260,6 +271,24 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         command = call.data.get(CONF_SEND_COMMAND, DEFAULT_NAME_COMMANDS)
         _LOGGER.debug("Indego.send_command service called, with command: %s", command)
         await instance.async_send_command_to_client(command)
+
+    async def async_delete_alert(call):
+        """Handle the service call."""
+        instance = find_instance_for_mower_service_call(call)
+        alert_index = call.data.get(CONF_DELETE_ALERT, DEFAULT_NAME_COMMANDS)
+        _LOGGER.debug("Indego.delete_alert service called, with command: %s", alert_index)
+        await instance._update_alerts()
+        await instance.indego.delete_alert(alert_index)
+        await instance._update_alerts()     
+
+    async def async_delete_alert_all(call):
+        """Handle the service call."""
+        instance = find_instance_for_mower_service_call(call)
+        alert_index = call.data.get(CONF_DELETE_ALERT, DEFAULT_NAME_COMMANDS)
+        _LOGGER.debug("Indego.delete_alert_all service called, with command: %s", "all")
+        await instance._update_alerts()
+        await instance.indego.delete_all_alerts()
+        await instance._update_alerts() 
         
      async def async_download_map(call):
         """Handle the download of the map"""
@@ -301,7 +330,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             async_download_map,
             schema=SERVICE_SCHEMA_DOWNLOAD_MAP,
         )
-
+        hass.services.async_register(
+            DOMAIN, SERVICE_NAME_DELETE_ALERT, async_delete_alert, schema=SERVICE_SCHEMA_DELETE_ALERT
+        )
+        hass.services.async_register(
+            DOMAIN, SERVICE_NAME_DELETE_ALERT_ALL, async_delete_alert_all, schema=SERVICE_SCHEMA_DELETE_ALERT_ALL
+        )
 
         hass.data[DOMAIN][CONF_SERVICES_REGISTERED] = entry.entry_id
 
