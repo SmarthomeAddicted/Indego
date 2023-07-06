@@ -66,6 +66,8 @@ from .const import (
     ENTITY_RUNTIME,
     ENTITY_UPDATE_AVAILABLE,
     ENTITY_VACUUM,
+    ENTITY_YSVGPOS,
+    ENTITY_XSVGPOS,
     INDEGO_PLATFORMS,
     SENSOR_TYPE,
     SERVICE_NAME_COMMAND,
@@ -214,6 +216,22 @@ ENTITY_DEFINITIONS = {
             "total_charging_time_h",
             "total_operation_time_h",
         ],
+    },
+    ENTITY_XSVGPOS: {
+        CONF_TYPE: SENSOR_TYPE,
+        CONF_NAME: "position svg x",
+        CONF_ICON: "mdi:image-marker",
+        CONF_DEVICE_CLASS: None,
+        CONF_UNIT_OF_MEASUREMENT: None,
+        CONF_ATTR: [],
+    },
+    ENTITY_YSVGPOS: {
+        CONF_TYPE: SENSOR_TYPE,
+        CONF_NAME: "position svg y",
+        CONF_ICON: "mdi:image-marker",
+        CONF_DEVICE_CLASS: None,
+        CONF_UNIT_OF_MEASUREMENT: None,
+        CONF_ATTR: [],
     },
     ENTITY_VACUUM: {
         CONF_TYPE: VACUUM_TYPE,
@@ -638,6 +656,8 @@ class IndegoHub:
         if not self._indego_client.state:
             return  # State update failed
 
+        self.entities[ENTITY_XSVGPOS].state = self._indego_client.state.svg_xPos
+        self.entities[ENTITY_YSVGPOS].state = self._indego_client.state.svg_yPos
         self.entities[ENTITY_MOWER_STATE].state = self._indego_client.state_description
         self.entities[
             ENTITY_MOWER_STATE_DETAIL
