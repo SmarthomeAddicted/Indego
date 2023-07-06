@@ -26,3 +26,15 @@ download_map:
     filename: 
       description: Download current Map 
       example: "mapWithoutIndego"
+      delete_alert:
+description: Delete the selected Alert
+  fields:
+    alert_index: 
+      description: Delete the selected Alert in this case the latest
+      example: "0"
+delete_alert_all:
+  description: Delete the selected Alert
+  fields:
+    alert_index: 
+      description: Delete all Alerts
+      example: "0"
