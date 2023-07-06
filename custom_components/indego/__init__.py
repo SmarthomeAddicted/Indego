@@ -278,16 +278,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         alert_index = call.data.get(CONF_DELETE_ALERT, DEFAULT_NAME_COMMANDS)
         _LOGGER.debug("Indego.delete_alert service called, with command: %s", alert_index)
         await instance._update_alerts()
-        await instance.indego.delete_alert(alert_index)
+        await instance._indego_client.delete_alert(alert_index)
         await instance._update_alerts()     
 
     async def async_delete_alert_all(call):
         """Handle the service call."""
         instance = find_instance_for_mower_service_call(call)
-        alert_index = call.data.get(CONF_DELETE_ALERT, DEFAULT_NAME_COMMANDS)
         _LOGGER.debug("Indego.delete_alert_all service called, with command: %s", "all")
         await instance._update_alerts()
-        await instance.indego.delete_all_alerts()
+        await instance._indego_client.delete_all_alerts()
         await instance._update_alerts() 
         
      async def async_download_map(call):
