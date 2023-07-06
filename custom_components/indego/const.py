@@ -31,6 +31,8 @@ SERVICE_NAME_SMARTMOW: Final = "smartmowing"
 SERVICE_NAME_DOWNLOAD_MAP: Final = "download_map"
 SERVICE_NAME_DELETE_ALERT: Final = "delete_alert"
 SERVICE_NAME_DELETE_ALERT_ALL: Final = "delete_alert_all"
+SERVICE_NAME_READ_ALERT: Final = "read_alert"
+SERVICE_NAME_READ_ALERT_ALL: Final = "read_alert_all"
 
 SENSOR_TYPE: Final = "sensor"
 BINARY_SENSOR_TYPE: Final = "binary_sensor"
