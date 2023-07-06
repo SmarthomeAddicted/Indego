@@ -20,6 +20,7 @@ CONF_ATTR: Final = "attributes"
 CONF_SEND_COMMAND: Final = "command"
 CONF_SMARTMOWING: Final = "enable"
 CONF_POLLING: Final = "polling"
+CONF_DELETE_ALERT: Final ="alert_index"
 
 DEFAULT_NAME: Final = "Indego"
 DEFAULT_NAME_COMMANDS: Final = None
@@ -28,6 +29,8 @@ DEFAULT_MAP_NAME: Final = "mapWithoutIndego"
 SERVICE_NAME_COMMAND: Final = "command"
 SERVICE_NAME_SMARTMOW: Final = "smartmowing"
 SERVICE_NAME_DOWNLOAD_MAP: Final = "download_map"
+SERVICE_NAME_DELETE_ALERT: Final = "delete_alert"
+SERVICE_NAME_DELETE_ALERT_ALL: Final = "delete_alert_all"
 
 SENSOR_TYPE: Final = "sensor"
 BINARY_SENSOR_TYPE: Final = "binary_sensor"
