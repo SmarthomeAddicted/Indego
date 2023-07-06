@@ -14,6 +14,7 @@ DATA_UPDATED: Final = f"{DOMAIN}_data_updated"
 CONF_MOWER_SERIAL: Final = "mower_serial"
 CONF_MOWER_NAME: Final = "mower_name"
 CONF_SERVICES_REGISTERED: Final = "services_registered"
+CONF_DOWNLOAD_MAP: Final = "filename"
 
 CONF_ATTR: Final = "attributes"
 CONF_SEND_COMMAND: Final = "command"
@@ -22,9 +23,11 @@ CONF_POLLING: Final = "polling"
 
 DEFAULT_NAME: Final = "Indego"
 DEFAULT_NAME_COMMANDS: Final = None
+DEFAULT_MAP_NAME: Final = "mapWithoutIndego"
 
 SERVICE_NAME_COMMAND: Final = "command"
 SERVICE_NAME_SMARTMOW: Final = "smartmowing"
+SERVICE_NAME_DOWNLOAD_MAP: Final = "download_map"
 
 SENSOR_TYPE: Final = "sensor"
 BINARY_SENSOR_TYPE: Final = "binary_sensor"
