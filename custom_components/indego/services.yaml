@@ -38,3 +38,15 @@ delete_alert_all:
     alert_index: 
       description: Delete all Alerts
       example: "0"
+read_alert:
+  description: Read the selected Alert
+  fields:
+    alert_index: 
+      description: marked the selected Alert as read
+      example: "0"
+read_alert_all:
+  description: Read the selected Alert
+  fields:
+    alert_index: 
+      description: marked all Alerts as read
+      example: "0"
