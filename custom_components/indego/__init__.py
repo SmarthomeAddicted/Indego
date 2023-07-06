@@ -51,6 +51,7 @@ from .const import (
     CONF_SMARTMOWING,
     CONF_DOWNLOAD_MAP,
     CONF_DELETE_ALERT,
+    CONF_READ_ALERT,
     DEFAULT_NAME_COMMANDS,
     DEFAULT_MAP_NAME,
     DOMAIN,
@@ -75,6 +76,8 @@ from .const import (
     SERVICE_NAME_DOWNLOAD_MAP,
     SERVICE_NAME_DELETE_ALERT,
     SERVICE_NAME_DELETE_ALERT_ALL,
+    SERVICE_NAME_READ_ALERT,
+    SERVICE_NAME_READ_ALERT_ALL,
 )
 from .sensor import IndegoSensor
 
@@ -89,6 +92,7 @@ SERVICE_SCHEMA_SMARTMOWING = vol.Schema({
     vol.Optional(CONF_MOWER_SERIAL): cv.string,
     vol.Required(CONF_SMARTMOWING): cv.string
 })
+
 SERVICE_SCHEMA_DOWNLOAD_MAP = vol.Schema({
     vol.Optional(CONF_DOWNLOAD_MAP, default=DEFAULT_MAP_NAME): cv.string
 })
@@ -101,6 +105,13 @@ SERVICE_SCHEMA_DELETE_ALERT_ALL = vol.Schema({
     vol.Required(CONF_DELETE_ALERT): cv.string
 })
 
+SERVICE_SCHEMA_READ_ALERT = vol.Schema({
+    vol.Required(CONF_READ_ALERT): cv.positive_int
+})
+
+SERVICE_SCHEMA_READ_ALERT_ALL = vol.Schema({
+    vol.Required(CONF_READ_ALERT): cv.string
+})
 
 def FUNC_ICON_MOWER_ALERT(state):
     if state:
@@ -282,7 +293,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 return instance
 
         raise HomeAssistantError("No mower instance found for serial '%s'" % mower_serial)
-
+        
     async def async_send_command(call):
         """Handle the mower command service call."""
         instance = find_instance_for_mower_service_call(call)
@@ -307,6 +318,24 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         await instance._update_alerts()
         await instance._indego_client.delete_all_alerts()
         await instance._update_alerts() 
+
+     async def async_read_alert(call):
+        """Handle the service call."""
+        instance = find_instance_for_mower_service_call(call)
+        alert_index = call.data.get(CONF_READ_ALERT, DEFAULT_NAME_COMMANDS)
+        _LOGGER.debug("Indego.read_alert service called, with command: %s", alert_index)
+        await hass.data[DOMAIN]._update_alerts()
+        await hass.data[DOMAIN]._indego_client.put_alert_read(alert_index)
+        await hass.data[DOMAIN]._update_alerts()
+
+    async def async_read_alert_all(call):
+        """Handle the service call."""
+        instance = find_instance_for_mower_service_call(call)
+        alert_index = call.data.get(CONF_READ_ALERT, DEFAULT_NAME_COMMANDS)
+        _LOGGER.debug("Indego.read_alert_all service called, with command: %s", "all")
+        await hass.data[DOMAIN]._update_alerts()
+        await hass.data[DOMAIN]._indego_client.put_all_alerts_read()
+        await hass.data[DOMAIN]._update_alerts()
         
      async def async_download_map(call):
         """Handle the download of the map"""
@@ -353,6 +382,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         )
         hass.services.async_register(
             DOMAIN, SERVICE_NAME_DELETE_ALERT_ALL, async_delete_alert_all, schema=SERVICE_SCHEMA_DELETE_ALERT_ALL
+        )
+        hass.services.async_register(
+            DOMAIN, SERVICE_NAME_READ_ALERT, async_read_alert, schema=SERVICE_SCHEMA_READ_ALERT
+        )
+        hass.services.async_register(
+            DOMAIN, SERVICE_NAME_READ_ALERT_ALL, async_read_alert_all, schema=SERVICE_SCHEMA_READ_ALERT_ALL
         )
 
         hass.data[DOMAIN][CONF_SERVICES_REGISTERED] = entry.entry_id
