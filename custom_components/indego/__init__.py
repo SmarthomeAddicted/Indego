@@ -49,7 +49,9 @@ from .const import (
     CONF_ATTR,
     CONF_SEND_COMMAND,
     CONF_SMARTMOWING,
+    CONF_DOWNLOAD_MAP,
     DEFAULT_NAME_COMMANDS,
+    DEFAULT_MAP_NAME,
     DOMAIN,
     ENTITY_ALERT,
     ENTITY_BATTERY,
@@ -67,6 +69,7 @@ from .const import (
     SENSOR_TYPE,
     SERVICE_NAME_COMMAND,
     SERVICE_NAME_SMARTMOW,
+    SERVICE_NAME_DOWNLOAD_MAP,
 )
 from .sensor import IndegoSensor
 
@@ -80,6 +83,9 @@ SERVICE_SCHEMA_COMMAND = vol.Schema({
 SERVICE_SCHEMA_SMARTMOWING = vol.Schema({
     vol.Optional(CONF_MOWER_SERIAL): cv.string,
     vol.Required(CONF_SMARTMOWING): cv.string
+})
+SERVICE_SCHEMA_DOWNLOAD_MAP = vol.Schema({
+    vol.Optional(CONF_DOWNLOAD_MAP, default=DEFAULT_MAP_NAME): cv.string
 })
 
 
@@ -254,7 +260,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         command = call.data.get(CONF_SEND_COMMAND, DEFAULT_NAME_COMMANDS)
         _LOGGER.debug("Indego.send_command service called, with command: %s", command)
         await instance.async_send_command_to_client(command)
-
+        
+     async def async_download_map(call):
+        """Handle the download of the map"""
+        instance = find_instance_for_mower_service_call(call)
+        name = call.data.get(CONF_DOWNLOAD_MAP, DEFAULT_MAP_NAME)
+        filename = hass.config.path(f"www/{name}.svg")
+        _LOGGER.debug("Indego.download_map service called %s", name)
+        await instance._download_map(filename)
+     
     async def async_send_smartmowing(call):
         """Handle the smartmowing service call."""
         instance = find_instance_for_mower_service_call(call)
@@ -281,6 +295,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             async_send_smartmowing,
             schema=SERVICE_SCHEMA_SMARTMOWING,
         )
+        hass.services.async_register(
+            DOMAIN,
+            SERVICE_NAME_DOWNLOAD_MAP,
+            async_download_map,
+            schema=SERVICE_SCHEMA_DOWNLOAD_MAP,
+        )
+
 
         hass.data[DOMAIN][CONF_SERVICES_REGISTERED] = entry.entry_id
 
@@ -714,7 +735,11 @@ class IndegoHub:
             self.entities[ENTITY_LAWN_MOWED].add_attribute(
                 {"next_mow": self._indego_client.next_mow.strftime("%Y-%m-%d %H:%M")}
             )
-
+            
+    async def _download_map(self, filename: str):
+        _LOGGER.debug(f"Downloading map to {filename}")
+        await self._indego_client.download_map(filename)
+        
     @property
     def serial(self) -> str:
         return self._serial
