@@ -319,7 +319,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         await instance._indego_client.delete_all_alerts()
         await instance._update_alerts() 
 
-     async def async_read_alert(call):
+    async def async_read_alert(call):
         """Handle the service call."""
         instance = find_instance_for_mower_service_call(call)
         alert_index = call.data.get(CONF_READ_ALERT, DEFAULT_NAME_COMMANDS)
