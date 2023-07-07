@@ -21,6 +21,7 @@ CONF_SEND_COMMAND: Final = "command"
 CONF_SMARTMOWING: Final = "enable"
 CONF_POLLING: Final = "polling"
 CONF_DELETE_ALERT: Final ="alert_index"
+CONF_READ_ALERT: Final ="alert_index"
 
 DEFAULT_NAME: Final = "Indego"
 DEFAULT_NAME_COMMANDS: Final = None
